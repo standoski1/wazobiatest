@@ -1,8 +1,57 @@
+import moment from 'moment'
 import Head from 'next/head'
-import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import {Row,Col,Card,Navbar,Container,Nav,Button,Modal} from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
+import { logoutUser } from '../redux/userSlice'
 import styles from '../styles/Home.module.css'
+import { tokenInstance } from '../utils/axios'
 
 export default function Home() {
+  // @ts-ignore
+  const {accessToken} = useSelector(state => state.user)
+  const router = useRouter()
+  const [show, setShow] = useState(false);
+  const [Note, setNote] = useState({
+    title:'',text:''
+  })
+  const [newNote, setNewNote] = useState<any[]>([])
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+     if (!accessToken) {
+      router.push('/sign/in')
+     }
+  }, [accessToken])
+
+  useEffect(() => {
+    fetchAllPost()
+  }, [])
+  
+  const fetchAllPost = async()=>{
+    await tokenInstance(accessToken).get('api/post').then((res)=>{
+      setNewNote(res.data)
+    }).catch((err)=>{
+      console.log(err.message)
+    }) 
+  }
+
+
+  const handleNote = async()=>{
+    await tokenInstance(accessToken).post('api/post', {Note}).then((res)=>{
+      setNewNote(prev=> [res.data, ...prev])
+      handleClose()
+    }).catch((err)=>{
+      console.log(err.message)
+    })
+  }
+  
+
+  if (accessToken) {
   return (
     <div className={styles.container}>
       <Head>
@@ -11,61 +60,63 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+      <Navbar bg="light" style={{padding:'5px 15px',marginBottom:'2rem'}}>
+        <Navbar.Brand>Notes</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link>Home</Nav.Link>
+            <Nav.Link onClick={()=>dispatch(logoutUser())}>Logout</Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+    </Navbar>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
+    <Container>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+      <Button onClick={handleShow} size='sm' style={{marginBottom:'1.5rem'}}>add Note</Button>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+      <Row>
+        {newNote?.map((data,index)=>(
+        <Col md={4} sm={6} lg={3} key={index} style={{marginBottom:'15px'}}>
+        <Link href={`/note?id=${data._id}`} style={{textDecoration:'none'}}>
+          <Card>
+          <Card.Body>
+            <Card.Subtitle className="mb-2 text-muted">{data.title}</Card.Subtitle>
+            <Card.Text style={{color:'#494848',fontSize:'14px'}}>
+              {(data.text).slice(0,80)}...
+            </Card.Text>
+             <Card.Footer style={{color:'#777676',fontSize:'12px'}}>
+               {moment(data.createdAt).format("MMM Do YYYY")}
+             </Card.Footer>
+            </Card.Body>
+        </Card>
+        </Link>
+        </Col>
+        ))}
+      </Row>
+    </Container>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
 
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>Add Note</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <input onChange={(e)=>setNote({...Note,title:e.target.value})} type="text" className='form-control' placeholder='add title'/><br />
+        <textarea onChange={(e)=>setNote({...Note,text:e.target.value})} placeholder='create note' className='form-control' cols={30} rows={5}></textarea>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Close
+        </Button>
+        <Button variant="primary" onClick={handleNote}>
+          Save Changes
+        </Button>
+      </Modal.Footer>
+    </Modal>
+
     </div>
   )
+  }
 }
