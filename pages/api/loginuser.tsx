@@ -11,7 +11,6 @@ const generateToken = (id:string)=> {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {    
 
-    if(req.method === "POST"){
       const {username} = req.body.userData
       const {password} = req.body.userData
       
@@ -30,5 +29,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } catch (error:any) {
           res.status(400).json(error.message)          
       }
-    }
 }

@@ -5,7 +5,6 @@ import userModel from '../../model/userModel'
 
 export default async function Create(req: NextApiRequest, res: NextApiResponse) {   
 
-    if(req.method === "POST"){
       const {password} = req.body.userData
       const {username} = req.body.userData
       const {email} = req.body.userData
@@ -21,5 +20,4 @@ export default async function Create(req: NextApiRequest, res: NextApiResponse) 
       } catch (error:any) {
           res.status(400).json(error)
       }
-    }
 }
