@@ -2,7 +2,7 @@ import axios from "axios";
 import https from 'https'
 
 export const tokenInstance = (TOKEN:string) => axios.create({
-  baseURL: "/",
+  baseURL: "https://wazobiatst.netlify.app/",
   timeout: 360000,
   httpsAgent: new https.Agent({ keepAlive: true }),
   headers: { 'Content-Type':'application/json', token: `Bearer ${TOKEN}` },
@@ -10,7 +10,7 @@ export const tokenInstance = (TOKEN:string) => axios.create({
 
 
 export const axiosInstance = axios.create({
-    baseURL: "/",
+    baseURL: "https://wazobiatst.netlify.app/",
     timeout: 360000,
     httpsAgent: new https.Agent({ keepAlive: true }),
 });
