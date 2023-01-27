@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import userModel from '../../model/userModel'
+import { mongoConnect } from '../../utils/dbConnect'
 
 
 
 export default async function Create(req: NextApiRequest, res: NextApiResponse) {   
-
+      mongoConnect()
       const {password} = req.body.userData
       const {username} = req.body.userData
       const {email} = req.body.userData

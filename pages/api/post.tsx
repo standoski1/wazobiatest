@@ -1,8 +1,10 @@
 import handler from '../../middleware/verify';
 import postModel from '../../model/postModel';
+import { mongoConnect } from '../../utils/dbConnect';
 
 
 handler.post(async (req, res)=>{
+  mongoConnect()
     const {title} = req.body.Note
     const {text} = req.body.Note
 
@@ -16,7 +18,7 @@ handler.post(async (req, res)=>{
 
 
 handler.get(async (req, res)=>{
-     
+  mongoConnect()
   try {
      const fetchpost = await postModel.find({}).sort({createdAt: -1})
      res.status(200).json(fetchpost)
@@ -27,6 +29,7 @@ handler.get(async (req, res)=>{
 
 
 handler.patch(async (req, res)=>{
+  mongoConnect()
   const {id} = req.body
   try {
      const fetchpost = await postModel.findOne({_id:id})
@@ -38,6 +41,7 @@ handler.patch(async (req, res)=>{
 
 
 handler.delete(async (req, res)=>{
+  mongoConnect()
   const {id} = req.query
   try {
      const fetchpost = await postModel.findOneAndDelete({_id:id})
@@ -49,6 +53,7 @@ handler.delete(async (req, res)=>{
 
 
 handler.put(async (req, res)=>{
+  mongoConnect()
   const {id} = req.query
   const {title} = req.body.Note
   const {text} = req.body.Note

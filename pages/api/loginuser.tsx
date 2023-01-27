@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import { NextApiRequest, NextApiResponse } from 'next'
 import userModel from '../../model/userModel'
 import bcrypt from "bcryptjs"
+import { mongoConnect } from '../../utils/dbConnect'
 
 
 const generateToken = (id:string)=> {
@@ -10,7 +11,7 @@ const generateToken = (id:string)=> {
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {    
-
+      mongoConnect()
       const {username} = req.body.userData
       const {password} = req.body.userData
       
