@@ -13,4 +13,4 @@ export const axiosInstance = axios.create({
     baseURL: "/",
     timeout: 360000,
     httpsAgent: new https.Agent({ keepAlive: true }),
-});
+})
